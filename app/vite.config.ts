@@ -89,10 +89,13 @@ export default defineConfig(({ mode }) => {
     server: {
       port: Number.parseInt(env.VITE_PORT) || 3002,
       proxy: {
+        // HTTP API proxy
         '/api': {
           target: env.VITE_PROXY_TARGET || 'http://localhost:9001',
           changeOrigin: true,
           secure: false,
+          ws: true,
+          rewriteWsOrigin: true,
         },
       },
     },

@@ -4,43 +4,42 @@ import { useNProgress } from '@/lib/nprogress/nprogress'
 import { useUserStore } from '@/pinia'
 import { authRoutes } from './modules/auth'
 
-import { backupRoutes } from './modules/backup'
-import { certificatesRoutes } from './modules/certificates'
-import { configRoutes } from './modules/config'
-import { dashboardRoutes } from './modules/dashboard'
-import { dnsRoutes } from './modules/dns'
-import { errorRoutes } from './modules/error'
-import { namespacesRoutes } from './modules/namespaces'
-import { nginxLogRoutes } from './modules/nginx_log'
-import { nodesRoutes } from './modules/nodes'
-import { notificationsRoutes } from './modules/notifications'
-import { preferenceRoutes } from './modules/preference'
-import { sitesRoutes } from './modules/sites'
-import { streamsRoutes } from './modules/streams'
-import { systemRoutes } from './modules/system'
-import { terminalRoutes } from './modules/terminal'
-import { upstreamRoutes } from './modules/upstream'
+// Dimension 1: User & Access Control
 import { userRoutes } from './modules/user'
+// Dimension 2: OS & Infra (Dashboard)
+import { dashboardRoutes } from './modules/dashboard'
+// Dimension 3: Web Server Management
+import { configRoutes } from './modules/config'
+import { nginxLogRoutes } from './modules/nginx_log'
+import { sitesRoutes } from './modules/sites'
+import { terminalRoutes } from './modules/terminal'
+// Dimension 4: Database Management
+import { databaseRoutes } from './modules/database'
+// Dimension 5: Security & Backup
+import { backupRoutes } from './modules/backup'
+import { securityRoutes } from './modules/security'
+import { systemRoutes } from './modules/system'
+
+import { errorRoutes } from './modules/error'
 import 'nprogress/nprogress.css'
 
-// Combine child routes for the main layout
+// Combine child routes for the main layout (5-dimension LAMP/LEMP structure)
 const mainLayoutChildren: RouteRecordRaw[] = [
+  // มิติที่ 2: OS & Infra
   ...dashboardRoutes,
-  ...sitesRoutes,
-  ...streamsRoutes,
-  ...upstreamRoutes,
-  ...configRoutes,
-  ...certificatesRoutes,
-  ...dnsRoutes,
-  ...terminalRoutes,
-  ...nginxLogRoutes,
-  ...namespacesRoutes,
-  ...nodesRoutes,
-  ...notificationsRoutes,
+  // มิติที่ 1: User & Access Control
   ...userRoutes,
-  ...preferenceRoutes,
+  // มิติที่ 3: Web Server Management
+  ...sitesRoutes,
+  ...configRoutes,
+  ...nginxLogRoutes,
+  ...terminalRoutes,
+  // มิติที่ 4: Database Management
+  ...databaseRoutes,
+  // มิติที่ 5: Security & Backup
   ...backupRoutes,
   ...systemRoutes,
+  ...securityRoutes,
 ]
 
 // Main routes configuration

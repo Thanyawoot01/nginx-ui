@@ -14,13 +14,14 @@ export function buildWebSocketUrl(url: string, token: string, shortToken: string
   const authParam = shortToken ? `token=${shortToken}` : `token=${btoa(token)}`
 
   // In development mode, connect directly to backend server
-  if (import.meta.env.DEV) {
+  // UNLESS VITE_WS_USE_HOST is set (e.g. Docker behind nginx proxy), in which case use window.location.host
+  if (import.meta.env.DEV && !import.meta.env.VITE_WS_USE_HOST) {
     const proxyTarget = import.meta.env.VITE_PROXY_TARGET || 'http://localhost:9000'
     const wsTarget = proxyTarget.replace(/^https?:/, location.protocol === 'https:' ? 'wss:' : 'ws:')
     return urlJoin(wsTarget, url, `?${authParam}`, node_id)
   }
 
-  // In production mode, use current host
+  // In production mode (or docker proxy mode), use current host
   const protocol = location.protocol === 'https:' ? 'wss://' : 'ws://'
   return urlJoin(protocol + window.location.host, window.location.pathname, url, `?${authParam}`, node_id)
 }
