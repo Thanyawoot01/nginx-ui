@@ -10,6 +10,7 @@ export const systemRoutes: RouteRecordRaw[] = [
     meta: {
       name: () => $gettext('System'),
       icon: InfoCircleOutlined,
+      roles: ['admin'],
     },
     children: [{
       path: 'self_check',

@@ -9,6 +9,7 @@ export const databaseRoutes: RouteRecordRaw[] = [
     meta: {
       name: () => $gettext('Database Management'),
       icon: DatabaseOutlined,
+      roles: ['admin', 'dbadmin'],
     },
   },
 ]

@@ -3,7 +3,7 @@ import { throttle } from 'lodash'
 import { storeToRefs } from 'pinia'
 import settings from '@/api/settings'
 import PageHeader from '@/components/PageHeader'
-import { useSettingsStore } from '@/pinia'
+import { useSettingsStore, useUserStore } from '@/pinia'
 import { useNodeAvailabilityStore } from '@/pinia/moudule/nodeAvailability'
 import { useProxyAvailabilityStore } from '@/pinia/moudule/proxyAvailability'
 import FooterLayout from './FooterLayout.vue'
@@ -32,10 +32,13 @@ function collapse() {
 }
 
 const { server_name } = storeToRefs(useSettingsStore())
+const user = useUserStore()
 
-settings.get_server_name().then(r => {
-  server_name.value = r.name
-})
+if (user.info?.role === 'admin') {
+  settings.get_server_name().then(r => {
+    server_name.value = r.name
+  })
+}
 
 // Initialize stores monitoring after user is logged in and layout is mounted
 const proxyAvailabilityStore = useProxyAvailabilityStore()
@@ -45,20 +48,24 @@ onMounted(() => {
   // Initialize layout
   init()
 
-  // Start monitoring for upstream availability
-  proxyAvailabilityStore.startMonitoring()
+  if (user.info?.role === 'admin') {
+    // Start monitoring for upstream availability
+    proxyAvailabilityStore.startMonitoring()
 
-  // Start monitoring for node availability
-  nodeAvailabilityStore.startMonitoring()
+    // Start monitoring for node availability
+    nodeAvailabilityStore.startMonitoring()
+  }
 })
 
 onUnmounted(() => {
   // Remove resize listener
   removeEventListener('resize', init)
 
-  // Stop monitoring when layout is unmounted
-  proxyAvailabilityStore.stopMonitoring()
-  nodeAvailabilityStore.stopMonitoring()
+  if (user.info?.role === 'admin') {
+    // Stop monitoring when layout is unmounted
+    proxyAvailabilityStore.stopMonitoring()
+    nodeAvailabilityStore.stopMonitoring()
+  }
 })
 
 const breadList = ref([])

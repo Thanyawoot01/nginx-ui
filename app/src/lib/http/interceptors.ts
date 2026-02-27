@@ -142,9 +142,15 @@ export function setupResponseInterceptor() {
             await otpModal.open()
             break
           case 403:
-            user.logout()
-            await router.push('/login')
-            return
+            if (error.response.data?.message?.includes('Forbidden: You do not have permission')) {
+              break
+            }
+            if (error.response.data?.message === 'Authorization failed' || !error.response.data?.message) {
+              user.logout()
+              await router.push('/login')
+              return
+            }
+            break
         }
       }
 

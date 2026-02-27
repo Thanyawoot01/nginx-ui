@@ -3,15 +3,13 @@ package main
 
 import (
 	"flag"
-	"fmt"
-	"path/filepath"
 	"runtime"
 
 	"github.com/0xJacky/Nginx-UI/model"
 	"github.com/0xJacky/Nginx-UI/settings"
 	"github.com/uozi-tech/cosy/logger"
 	cSettings "github.com/uozi-tech/cosy/settings"
-	"gorm.io/driver/sqlite"
+	"gorm.io/driver/mysql"
 	"gorm.io/gen"
 	"gorm.io/gorm"
 	gormlogger "gorm.io/gorm/logger"
@@ -52,10 +50,11 @@ func main() {
 	flag.Parse()
 
 	cSettings.Init(confPath)
-	dbPath := filepath.Join(filepath.Dir(confPath), fmt.Sprintf("%s.db", settings.DatabaseSettings.Name))
+
+	dsn := settings.DatabaseSettings.DSN()
 
 	var err error
-	db, err := gorm.Open(sqlite.Open(dbPath), &gorm.Config{
+	db, err := gorm.Open(mysql.Open(dsn), &gorm.Config{
 		Logger:                                   gormlogger.Default.LogMode(gormlogger.Info),
 		PrepareStmt:                              true,
 		DisableForeignKeyConstraintWhenMigrating: true,

@@ -9,6 +9,7 @@ export const terminalRoutes: RouteRecordRaw[] = [
     meta: {
       name: () => $gettext('Terminal'),
       icon: CodeOutlined,
+      roles: ['admin'],
     },
   },
 ]

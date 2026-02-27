@@ -5,18 +5,17 @@ import (
 	"crypto/rand"
 	"math/big"
 	"os"
-	"path"
 
 	"github.com/0xJacky/Nginx-UI/model"
 	"github.com/0xJacky/Nginx-UI/query"
 	"github.com/0xJacky/Nginx-UI/settings"
 	"github.com/gin-gonic/gin"
 	"github.com/uozi-tech/cosy"
-	sqlite "github.com/uozi-tech/cosy-driver-sqlite"
 	"github.com/uozi-tech/cosy/logger"
 	cSettings "github.com/uozi-tech/cosy/settings"
 	"github.com/urfave/cli/v3"
 	"golang.org/x/crypto/bcrypt"
+	"gorm.io/driver/mysql"
 )
 
 func generateRandomPassword(length int) (string, error) {
@@ -48,14 +47,10 @@ func ResetInitUserPassword(ctx context.Context, command *cli.Command) error {
 		return ErrConfigNotFound
 	}
 
-	dbPath := path.Join(path.Dir(confPath), settings.DatabaseSettings.Name+".db")
-	logger.Infof("dbPath: %s", dbPath)
-	// check if db file exists
-	if _, err := os.Stat(dbPath); os.IsNotExist(err) {
-		return ErrDBFileNotFound
-	}
+	dsn := settings.DatabaseSettings.DSN()
+	logger.Infof("Connecting to MariaDB: %s", settings.DatabaseSettings.Host)
 
-	db := cosy.InitDB(sqlite.Open(path.Dir(cSettings.ConfPath), settings.DatabaseSettings))
+	db := cosy.InitDB(mysql.Open(dsn))
 	model.Use(db)
 	query.Init(db)
 

@@ -41,6 +41,11 @@ export const useUserStore = defineStore('user', () => {
   const isLogin = computed(() => !!token.value)
   const passkeyLoginAvailable = computed(() => !!passkeyRawId.value)
 
+  // Roles
+  const isAdmin = computed(() => info.value.role === 'admin')
+  const isWebDev = computed(() => info.value.role === 'webdev')
+  const isDbAdmin = computed(() => info.value.role === 'dbadmin')
+
   function passkeyLogin(rawId: string, tokenValue: string, shortTokenValue?: string) {
     passkeyRawId.value = rawId
     login(tokenValue, shortTokenValue)
@@ -116,6 +121,9 @@ export const useUserStore = defineStore('user', () => {
     passkeyRawId,
     info,
     isLogin,
+    isAdmin,
+    isWebDev,
+    isDbAdmin,
     passkeyLoginAvailable,
     passkeyLogin,
     login,

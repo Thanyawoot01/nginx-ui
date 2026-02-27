@@ -8,6 +8,7 @@ export const nginxLogRoutes: RouteRecordRaw[] = [
     meta: {
       name: () => $gettext('Nginx Log'),
       icon: FileTextOutlined,
+      roles: ['admin', 'webdev'],
     },
     children: [{
       path: 'access',

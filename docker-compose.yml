@@ -1,14 +1,44 @@
 services:
+  mariadb:
+    image: mariadb:11
+    container_name: nginx-ui-mariadb
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: rootpassword
+      MYSQL_DATABASE: nginx_ui
+      MYSQL_USER: nginx_ui
+      MYSQL_PASSWORD: nginx_ui_pass
+    volumes:
+      - mariadb-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "healthcheck.sh", "--connect", "--innodb_initialized"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+
   backend:
-    image: uozi/nginx-ui:latest
+    build:
+      context: .
+      dockerfile: Dockerfile.backend
     container_name: nginx-ui-backend
     restart: always
     environment:
       - TZ=Asia/Bangkok
       - NGINX_UI_IGNORE_DOCKER_SOCKET=true
+      - NGINX_UI_DB_HOST=mariadb
+      - NGINX_UI_DB_PORT=3306
+      - NGINX_UI_DB_USER=nginx_ui
+      - NGINX_UI_DB_PASSWORD=nginx_ui_pass
+      - NGINX_UI_DB_NAME=nginx_ui
+      - NGINX_UI_NGINX_ACCESSLOGPATH=/var/log/nginx/access.log
+      - NGINX_UI_NGINX_ERRORLOGPATH=/var/log/nginx/error.log
+      - NGINX_UI_TERMINAL_START_CMD=bash
     volumes:
       - nginx-data:/etc/nginx
       - nginx-ui-data:/etc/nginx-ui
+    depends_on:
+      mariadb:
+        condition: service_healthy
 
   frontend:
     build:
@@ -27,7 +57,7 @@ services:
     container_name: nginx-ui-proxy
     restart: always
     ports:
-      - "8080:8080"
+      - "80:80"
     volumes:
       - ./nginx-proxy.conf:/etc/nginx/conf.d/default.conf:ro
     depends_on:
@@ -37,3 +67,4 @@ services:
 volumes:
   nginx-data:
   nginx-ui-data:
+  mariadb-data:

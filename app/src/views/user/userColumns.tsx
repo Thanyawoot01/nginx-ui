@@ -27,6 +27,31 @@ const columns: StdTableColumn[] = [{
   hiddenInTable: true,
   hiddenInDetail: true,
 }, {
+  title: () => $gettext('Role'),
+  dataIndex: 'role',
+  sorter: true,
+  pure: true,
+  customRender: (args: CustomRenderArgs) => {
+    const { text } = args
+    const colors: Record<string, string> = {
+      admin: 'red',
+      webdev: 'blue',
+      dbadmin: 'purple'
+    }
+    const color = colors[text as string] || 'default'
+    return h(Tag, { color }, () => text)
+  },
+  edit: {
+    type: 'select',
+    select: {
+      options: [
+        { label: 'Admin', value: 'admin' },
+        { label: 'Web Developer', value: 'webdev' },
+        { label: 'Database Admin', value: 'dbadmin' },
+      ],
+    },
+  },
+}, {
   title: () => $gettext('2FA'),
   dataIndex: 'enabled_2fa',
   customRender: (args: CustomRenderArgs) => {

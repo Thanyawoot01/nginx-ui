@@ -44,8 +44,8 @@ func DestroyAll(c *gin.Context) {
 		cosy.ErrHandler(c, err)
 		return
 	}
-	// reset auto increment
-	err = db.Exec("UPDATE sqlite_sequence SET seq = 0 WHERE name = 'notifications';").Error
+	// reset auto increment (MariaDB/MySQL compatible)
+	err = db.Exec("ALTER TABLE notifications AUTO_INCREMENT = 1").Error
 
 	if err != nil {
 		cosy.ErrHandler(c, err)

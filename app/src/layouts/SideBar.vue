@@ -7,6 +7,7 @@ import ngx from '@/api/ngx'
 import Logo from '@/components/Logo'
 import NodeIndicator from '@/components/NodeIndicator'
 import { useGlobalStore } from '@/pinia/moudule/global'
+import { useUserStore } from '@/pinia'
 import { routes } from '@/routes'
 
 const route = useRoute()
@@ -40,6 +41,7 @@ interface Meta {
   hiddenInSidebar: boolean
   hideChildren: boolean
   name: () => string
+  roles?: string[]
 }
 
 interface Sidebar {
@@ -76,6 +78,12 @@ const visible: ComputedRef<Sidebar[]> = computed(() => {
       return
     }
 
+    const user = useUserStore()
+    const role = user.info?.role || 'admin'
+    if (s.meta && (s.meta as any).roles && !(s.meta as any).roles.includes(role)) {
+      return
+    }
+
     const t: Sidebar = {
       path: s.path,
       name: s.name as string,
@@ -91,6 +99,10 @@ const visible: ComputedRef<Sidebar[]> = computed(() => {
 
       if (c.meta && c.meta.modules && c.meta.modules?.length > 0
         && !c.meta.modules.every(m => modulesMap.value[m]?.loaded)) {
+        return
+      }
+
+      if (c.meta && (c.meta as any).roles && !(c.meta as any).roles.includes(role)) {
         return
       }
 

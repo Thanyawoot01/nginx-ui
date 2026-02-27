@@ -9,6 +9,7 @@ export const userRoutes: RouteRecordRaw[] = [
     meta: {
       name: () => $gettext('Manage Users'),
       icon: UsergroupAddOutlined,
+      roles: ['admin'],
     },
   },
   {

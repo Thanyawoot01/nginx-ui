@@ -9,6 +9,7 @@ export const securityRoutes: RouteRecordRaw[] = [
     meta: {
       name: () => $gettext('Server Hardening'),
       icon: LockOutlined,
+      roles: ['admin'],
     },
   },
 ]

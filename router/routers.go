@@ -31,6 +31,7 @@ import (
 	"github.com/0xJacky/Nginx-UI/api/user"
 	"github.com/0xJacky/Nginx-UI/internal/middleware"
 	"github.com/0xJacky/Nginx-UI/mcp"
+	"github.com/0xJacky/Nginx-UI/model"
 	"github.com/gin-gonic/gin"
 	"github.com/uozi-tech/cosy"
 	"github.com/uozi-tech/cosy/debug"
@@ -78,46 +79,70 @@ func InitRouter() {
 		// Authorization required and not websocket request
 		g := root.Group("/", middleware.AuthRequired(), middleware.Proxy())
 		{
-			debug.InitRouter(g)
-			user.InitUserRouter(g)
+			// Shared (All authenticated users)
+			user.InitUserRouter(g) // Profile
 			analytic.InitRouter(g)
-			user.InitManageUserRouter(g)
-			nginx.InitRouter(g)
-			sites.InitRouter(g)
-			streams.InitRouter(g)
-			config.InitRouter(g)
-			template.InitRouter(g)
-			certificate.InitCertificateRouter(g)
-			certificate.InitDNSCredentialRouter(g)
-			certificate.InitAcmeUserRouter(g)
-			dnsapi.InitRouter(g)
-			system.InitPrivateRouter(g)
-			settings.InitRouter(g)
 			llm.InitRouter(g)
-			cluster.InitRouter(g)
-			notification.InitRouter(g)
-			external_notify.InitRouter(g)
-			backup.InitAutoBackupRouter(g)
-			nginxLog.InitRouter(g)
 			g.GET("/geolite/status", geolite.GetStatus)
+
+			// Admin only
+			adminOnly := g.Group("/", middleware.RequireRole(model.RoleAdmin))
+			{
+				debug.InitRouter(adminOnly)
+				user.InitManageUserRouter(adminOnly)
+				system.InitPrivateRouter(adminOnly)
+				settings.InitRouter(adminOnly)
+				backup.InitAutoBackupRouter(adminOnly)
+				cluster.InitRouter(adminOnly)
+				notification.InitRouter(adminOnly)
+				external_notify.InitRouter(adminOnly)
+			}
+
+			// Admin and WebDev
+			webDevShared := g.Group("/", middleware.RequireRole(model.RoleAdmin, model.RoleWebDev))
+			{
+				nginx.InitRouter(webDevShared)
+				sites.InitRouter(webDevShared)
+				streams.InitRouter(webDevShared)
+				config.InitRouter(webDevShared)
+				template.InitRouter(webDevShared)
+				certificate.InitCertificateRouter(webDevShared)
+				certificate.InitDNSCredentialRouter(webDevShared)
+				certificate.InitAcmeUserRouter(webDevShared)
+				dnsapi.InitRouter(webDevShared)
+				nginxLog.InitRouter(webDevShared)
+			}
 		}
 
 		// Authorization required and websocket request
 		w := root.Group("/", middleware.AuthRequired(), middleware.ProxyWs())
 		{
+			// Shared
 			analytic.InitWebSocketRouter(w)
-			certificate.InitCertificateWebSocketRouter(w)
 			event.InitRouter(w)
-			o := w.Group("", middleware.RequireSecureSession())
+
+			// Admin only
+			adminOnlyWs := w.Group("/", middleware.RequireRole(model.RoleAdmin))
 			{
-				terminal.InitRouter(o)
+				system.InitWebSocketRouter(adminOnlyWs)
+				cluster.InitWebSocketRouter(adminOnlyWs)
+				adminOnlyWs.GET("/geolite/download", geolite.DownloadGeoLiteDB)
+
+				// Terminal (also require SecureSession)
+				o := adminOnlyWs.Group("", middleware.RequireSecureSession())
+				{
+					terminal.InitRouter(o)
+				}
 			}
-			nginxLog.InitWebSocketRouter(w)
-			upstream.InitRouter(w)
-			system.InitWebSocketRouter(w)
-			nginx.InitWebSocketRouter(w)
-			cluster.InitWebSocketRouter(w)
-			w.GET("/geolite/download", geolite.DownloadGeoLiteDB)
+
+			// Admin and WebDev
+			webDevSharedWs := w.Group("/", middleware.RequireRole(model.RoleAdmin, model.RoleWebDev))
+			{
+				certificate.InitCertificateWebSocketRouter(webDevSharedWs)
+				nginxLog.InitWebSocketRouter(webDevSharedWs)
+				upstream.InitRouter(webDevSharedWs)
+				nginx.InitWebSocketRouter(webDevSharedWs)
+			}
 		}
 	}
 }

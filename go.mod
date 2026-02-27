@@ -55,7 +55,6 @@ require (
 	github.com/tufanbarisyildirim/gonginx v0.0.0-20250620092546-c3e307e36701
 	github.com/ulikunitz/xz v0.5.15
 	github.com/uozi-tech/cosy v1.28.0
-	github.com/uozi-tech/cosy-driver-sqlite v0.2.1
 	github.com/urfave/cli/v3 v3.6.2
 	golang.org/x/crypto v0.48.0
 	golang.org/x/net v0.50.0
@@ -63,7 +62,6 @@ require (
 	google.golang.org/grpc v1.79.1
 	gopkg.in/ini.v1 v1.67.1
 	gorm.io/datatypes v1.2.7
-	gorm.io/driver/sqlite v1.6.0
 	gorm.io/gen v0.3.27
 	gorm.io/gorm v1.31.1
 	gorm.io/plugin/dbresolver v1.6.2

@@ -23,9 +23,16 @@ type RecoveryCodes struct {
 	LastDownloaded *int64          `json:"last_downloaded,omitempty" gorm:"serializer:unixtime;type:datetime;default:null"`
 }
 
+const (
+	RoleAdmin   = "admin"
+	RoleWebDev  = "webdev"
+	RoleDBAdmin = "dbadmin"
+)
+
 type User struct {
 	Model
 
+	Role          string        `json:"role" gorm:"default:'admin'" cosy:"add:omitempty,oneof=admin webdev dbadmin;update:omitempty,oneof=admin webdev dbadmin"`
 	Name          string        `json:"name" cosy:"add:max=20;update:omitempty,max=20;list:fussy;db_unique"`
 	Password      string        `json:"-" cosy:"json:password;add:required,max=20;update:omitempty,max=20"`
 	Status        bool          `json:"status" gorm:"default:1"`

@@ -10,6 +10,7 @@ export const dashboardRoutes: RouteRecordRaw[] = [
       name: () => $gettext('OS & Infra Monitor'),
       icon: DashboardOutlined,
       hideChildren: true,
+      roles: ['admin'],
     },
     children: [
       {

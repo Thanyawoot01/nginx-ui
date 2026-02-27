@@ -81,11 +81,23 @@ func (JSONAesSerializer) Scan(ctx context.Context, field *schema.Field, dst refl
 		}
 
 		if len(bytes) > 0 {
-			bytes, err = AesDecrypt(bytes)
-			if err != nil {
-				return err
+			// Attempt to base64 decode. If it fails (e.g., existing raw bytes), continue with original bytes.
+			decodedBytes, errDecode := base64.StdEncoding.DecodeString(string(bytes))
+			if errDecode == nil {
+				// Only use decodedBytes if it's long enough to be a valid AES ciphertext.
+				if len(decodedBytes) >= aes.BlockSize {
+					bytes = decodedBytes
+				}
 			}
-			err = json.Unmarshal(bytes, fieldValue.Interface())
+
+			decrypted, errDecrypt := AesDecrypt(bytes)
+			if errDecrypt != nil {
+				// Decryption failed (e.g., empty/corrupted field for new users).
+				// Return zero value instead of propagating the error.
+				field.ReflectValueOf(ctx, dst).Set(fieldValue.Elem())
+				return nil
+			}
+			err = json.Unmarshal(decrypted, fieldValue.Interface())
 		}
 	}
 
@@ -104,5 +116,8 @@ func (JSONAesSerializer) Value(ctx context.Context, field *schema.Field, dst ref
 	}
 
 	encrypt, err := AesEncrypt(result)
-	return string(encrypt), err
+	if err != nil {
+		return nil, err
+	}
+	return base64.StdEncoding.EncodeToString(encrypt), nil
 }

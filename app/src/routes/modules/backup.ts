@@ -9,6 +9,7 @@ export const backupRoutes: RouteRecordRaw[] = [
     meta: {
       icon: ClockCircleOutlined,
       name: () => $gettext('Backup'),
+      roles: ['admin'],
     },
     children: [
       {

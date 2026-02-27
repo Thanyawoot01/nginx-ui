@@ -48,7 +48,13 @@ export const routes: RouteRecordRaw[] = [
     path: '/',
     name: 'Home',
     component: () => import('@/layouts/BaseLayout.vue'),
-    redirect: '/dashboard',
+    redirect: () => {
+      const user = useUserStore()
+      const role = user.info?.role || 'admin'
+      if (role === 'webdev') return '/sites'
+      if (role === 'dbadmin') return '/database'
+      return '/dashboard'
+    },
     meta: {
       name: () => $gettext('Home'),
     },
@@ -80,10 +86,21 @@ router.beforeEach((to, _, next) => {
 
   const user = useUserStore()
 
-  if (to.meta.noAuth || user.isLogin)
+  if (to.meta.noAuth || user.isLogin) {
+    if (user.isLogin && to.meta.roles) {
+      const allowedRoles = to.meta.roles as string[]
+      const role = user.info?.role || 'admin'
+      if (!allowedRoles.includes(role)) {
+        // Redirect unauthorized users to their allowed default route
+        if (role === 'webdev') return next({ path: '/sites' })
+        if (role === 'dbadmin') return next({ path: '/database' })
+        return next({ path: '/dashboard' })
+      }
+    }
     next()
-  else
+  } else {
     next({ path: '/login', query: { next: to.fullPath } })
+  }
 })
 
 router.afterEach(() => {

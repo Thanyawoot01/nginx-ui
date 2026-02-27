@@ -15,6 +15,8 @@ const emit = defineEmits<{
 
 const router = useRouter()
 const { message } = useGlobalApp()
+import { useUserStore } from '@/pinia'
+const user = useUserStore()
 
 function logout() {
   auth.logout().then(() => {
@@ -66,9 +68,9 @@ const { width: userWrapperWidth } = useElementSize(userWrapperRef)
 
       <ProcessingStatus />
 
-      <Notification :header-ref="headerRef" />
+      <Notification v-if="user.info?.role === 'admin'" :header-ref="headerRef" />
 
-      <NginxControl />
+      <NginxControl v-if="['admin', 'webdev'].includes(user.info?.role || 'admin')" />
 
       <a href="/">
         <HomeOutlined />

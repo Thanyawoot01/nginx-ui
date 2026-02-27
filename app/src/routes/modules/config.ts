@@ -10,6 +10,7 @@ export const configRoutes: RouteRecordRaw[] = [
       name: () => $gettext('Manage Configs'),
       icon: FileOutlined,
       hideChildren: true,
+      roles: ['admin', 'webdev'],
     },
   },
   {

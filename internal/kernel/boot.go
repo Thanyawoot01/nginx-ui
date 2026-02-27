@@ -6,7 +6,6 @@ import (
 	"encoding/hex"
 	"mime"
 	"os"
-	"path"
 	"path/filepath"
 	"reflect"
 	"runtime"
@@ -31,7 +30,7 @@ import (
 	"github.com/0xJacky/Nginx-UI/settings"
 	"github.com/google/uuid"
 	"github.com/uozi-tech/cosy"
-	sqlite "github.com/uozi-tech/cosy-driver-sqlite"
+	"gorm.io/driver/mysql"
 	"github.com/uozi-tech/cosy/kernel"
 	"github.com/uozi-tech/cosy/logger"
 	cModel "github.com/uozi-tech/cosy/model"
@@ -122,7 +121,7 @@ func InitDatabase(ctx context.Context) {
 		skipInstall()
 	}
 
-	db := cosy.InitDB(sqlite.Open(path.Dir(cSettings.ConfPath), settings.DatabaseSettings))
+	db := cosy.InitDB(mysql.Open(settings.DatabaseSettings.DSN()))
 	model.Use(db)
 	query.Init(db)
 

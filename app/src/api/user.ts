@@ -4,6 +4,7 @@ import { extendCurdApi, http, useCurdApi } from '@uozi-admin/request'
 export interface User extends ModelBase {
   name: string
   password: string
+  role: 'admin' | 'webdev' | 'dbadmin'
   enabled_2fa: boolean
   status: boolean
   language: string

@@ -9,6 +9,7 @@ export const sitesRoutes: RouteRecordRaw[] = [
     meta: {
       name: () => $gettext('Manage Sites'),
       icon: CloudOutlined,
+      roles: ['admin', 'webdev'],
     },
     redirect: '/sites/list',
     children: [{
