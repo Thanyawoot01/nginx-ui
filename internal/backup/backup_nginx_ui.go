@@ -1,6 +1,7 @@
 package backup
 
 import (
+	"os/exec"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -12,37 +13,68 @@ import (
 	cosysettings "github.com/uozi-tech/cosy/settings"
 )
 
+func dumpMariaDB(destDir string) error {
+
+	dbHost := settings.DatabaseSettings.Host
+	dbUser := settings.DatabaseSettings.User
+	dbPass := settings.DatabaseSettings.Password
+	dbName := settings.DatabaseSettings.Name
+
+	sqlFile := filepath.Join(destDir, "database.sql")
+
+	cmd := exec.Command(
+		"mysqldump",
+		"-h", dbHost,
+		"-u", dbUser,
+		fmt.Sprintf("-p%s", dbPass),
+		dbName,
+	)
+
+	outFile, err := os.Create(sqlFile)
+	if err != nil {
+		return err
+	}
+	defer outFile.Close()
+
+	cmd.Stdout = outFile
+	cmd.Stderr = os.Stderr
+
+	return cmd.Run()
+}
 // backupNginxUIFiles backs up the nginx-ui configuration and database files
 func backupNginxUIFiles(destDir string) error {
-	// Get config file path
+
 	configPath := cosysettings.ConfPath
 	if configPath == "" {
 		return ErrConfigPathEmpty
 	}
 
-	// Always save the config file as app.ini, regardless of its original name
 	destConfigPath := filepath.Join(destDir, "app.ini")
+
 	if err := copyFile(configPath, destConfigPath); err != nil {
 		return cosy.WrapErrorWithParams(ErrCopyConfigFile, err.Error())
 	}
 
-	// Get database file name and path
 	dbName := settings.DatabaseSettings.GetName()
 	dbFile := dbName + ".db"
 
-	// Database directory is the same as config file directory
 	dbDir := filepath.Dir(configPath)
 	dbPath := filepath.Join(dbDir, dbFile)
 
-	// Copy database file
-	if _, err := os.Stat(dbPath); err == nil {
-		// Database exists as file
-		destDBPath := filepath.Join(destDir, dbFile)
-		if err := copyFile(dbPath, destDBPath); err != nil {
-			return cosy.WrapErrorWithParams(ErrCopyDBFile, err.Error())
+	// Try MariaDB dump first
+	if err := dumpMariaDB(destDir); err != nil {
+
+		logger.Warn("MariaDB dump failed: %v", err)
+
+		// fallback sqlite
+		if _, err := os.Stat(dbPath); err == nil {
+
+			destDBPath := filepath.Join(destDir, dbFile)
+
+			if err := copyFile(dbPath, destDBPath); err != nil {
+				return cosy.WrapErrorWithParams(ErrCopyDBFile, err.Error())
+			}
 		}
-	} else {
-		logger.Warn("Database file not found: %s", dbPath)
 	}
 
 	return nil

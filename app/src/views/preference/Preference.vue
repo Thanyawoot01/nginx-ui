@@ -13,6 +13,7 @@ import {
   OpenAISettings,
   ServerSettings,
   TerminalSettings,
+  BackupSettings,
 } from '@/views/preference/tabs'
 import useSystemSettingsStore from './store'
 
@@ -113,6 +114,12 @@ onMounted(() => {
           :tab="$gettext('GeoLite')"
         >
           <GeoLiteSettings />
+        </ATabPane>
+        <ATabPane
+          key="backup"
+          :tab="$gettext('Backup')"
+        >
+          <BackupSettings />
         </ATabPane>
       </ATabs>
     </div>

@@ -119,6 +119,10 @@ export interface OIDCSettings {
   identifier: string
 }
 
+export interface BackupSettings {
+  granted_access_path: string[]
+}
+
 export interface Settings {
   app: AppSettings
   server: ServerSettings
@@ -135,6 +139,7 @@ export interface Settings {
   openai: OpenaiSettings
   terminal: TerminalSettings
   webauthn: WebauthnSettings
+  backup: BackupSettings
 }
 
 const settings = {

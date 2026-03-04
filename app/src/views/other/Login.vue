@@ -284,7 +284,7 @@ async function handlePasskeyLogin() {
       <div class="login-container">
         <div class="login-form">
           <div class="project-title">
-            <h1>Nginx UI</h1>
+            <h1>Group B</h1>
           </div>
 
           <div v-if="loading" class="loading-container">
@@ -297,83 +297,48 @@ async function handlePasskeyLogin() {
           <AForm v-else id="components-form-demo-normal-login">
             <template v-if="!enabled2FA">
               <AFormItem v-bind="validateInfos.username">
-                <AInput
-                  v-model:value="modelRef.username"
-                  :placeholder="$gettext('Username')"
-                >
+                <AInput v-model:value="modelRef.username" :placeholder="$gettext('Username')">
                   <template #prefix>
                     <UserOutlined style="color: rgba(0, 0, 0, 0.25)" />
                   </template>
                 </AInput>
               </AFormItem>
               <AFormItem v-bind="validateInfos.password">
-                <AInputPassword
-                  v-model:value="modelRef.password"
-                  :placeholder="$gettext('Password')"
-                >
+                <AInputPassword v-model:value="modelRef.password" :placeholder="$gettext('Password')">
                   <template #prefix>
                     <LockOutlined style="color: rgba(0, 0, 0, 0.25)" />
                   </template>
                 </AInputPassword>
               </AFormItem>
-              <AButton
-                v-if="has_casdoor"
-                block
-                :loading="loading"
-                class="mb-5"
-                @click="loginWithCasdoor"
-              >
+              <AButton v-if="has_casdoor" block :loading="loading" class="mb-5" @click="loginWithCasdoor">
                 {{ $gettext('SSO Login') }}
               </AButton>
-              <AButton
-                v-if="has_oidc"
-                block
-                :loading="loading"
-                class="mb-5"
-                @click="loginWithOIDC"
-              >
+              <AButton v-if="has_oidc" block :loading="loading" class="mb-5" @click="loginWithOIDC">
                 {{ $gettext('OIDC Login') }}
               </AButton>
             </template>
             <div v-else>
-              <Authorization
-                ref="refOTP"
-                :two-f-a-status="{
-                  enabled: true,
-                  otp_status: true,
-                  passkey_status: false,
-                  recovery_codes_generated: true,
-                }"
-                @submit-o-t-p="handleOTPSubmit"
-              />
+              <Authorization ref="refOTP" :two-f-a-status="{
+                enabled: true,
+                otp_status: true,
+                passkey_status: false,
+                recovery_codes_generated: true,
+              }" @submit-o-t-p="handleOTPSubmit" />
             </div>
 
             <AFormItem v-if="!enabled2FA">
-              <AButton
-                type="primary"
-                block
-                html-type="submit"
-                :loading="loading"
-                class="mb-2"
-                @click="onSubmit"
-              >
+              <AButton type="primary" block html-type="submit" :loading="loading" class="mb-2" @click="onSubmit">
                 {{ $gettext('Login') }}
               </AButton>
 
-              <div
-                v-if="passkeyConfigStatus"
-                class="flex flex-col justify-center"
-              >
+              <div v-if="passkeyConfigStatus" class="flex flex-col justify-center">
                 <ADivider>
                   <div class="text-sm font-normal opacity-75">
                     {{ $gettext('Or') }}
                   </div>
                 </ADivider>
 
-                <AButton
-                  :disabled="loading"
-                  @click="handlePasskeyLogin"
-                >
+                <AButton :disabled="loading" @click="handlePasskeyLogin">
                   <KeyOutlined />
                   {{ $gettext('Sign in with a passkey') }}
                 </AButton>

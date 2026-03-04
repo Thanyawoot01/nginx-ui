@@ -171,16 +171,10 @@ func createEncryptedBackup(autoBackup *model.AutoBackup) (*ExecutionResult, erro
 		return nil, err
 	}
 
-	// Create and write encryption key file
-	keyPath := outputPath + ".key"
-	if err := writeKeyFile(keyPath, backupResult.AESKey, backupResult.AESIv); err != nil {
-		return nil, err
-	}
-
 	return &ExecutionResult{
-		FilePath: outputPath,
-		KeyPath:  keyPath,
-	}, nil
+	FilePath: outputPath,
+	KeyPath:  "",
+}, nil
 }
 
 // createCustomDirectoryBackup creates an unencrypted backup of a custom directory.

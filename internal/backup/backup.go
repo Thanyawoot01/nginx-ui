@@ -2,7 +2,6 @@ package backup
 
 import (
 	"bytes"
-	"encoding/base64"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -59,17 +58,6 @@ func Backup() (Result, error) {
 	// Generate timestamp for unique backup identification
 	timestamp := time.Now().Format("20060102-150405")
 	backupName := fmt.Sprintf("backup-%s.zip", timestamp)
-
-	// Generate cryptographic keys for AES encryption
-	key, err := GenerateAESKey()
-	if err != nil {
-		return Result{}, cosy.WrapErrorWithParams(ErrGenerateAESKey, err.Error())
-	}
-
-	iv, err := GenerateIV()
-	if err != nil {
-		return Result{}, cosy.WrapErrorWithParams(ErrGenerateIV, err.Error())
-	}
 
 	// Create temporary directory for staging backup files
 	tempDir, err := os.MkdirTemp("", "nginx-ui-backup-*")
@@ -140,18 +128,18 @@ func Backup() (Result, error) {
 		return Result{}, cosy.WrapErrorWithParams(ErrCreateHashFile, err.Error())
 	}
 
-	// Encrypt all backup components for security
-	if err := encryptFile(hashInfoPath, key, iv); err != nil {
-		return Result{}, cosy.WrapErrorWithParams(ErrEncryptFile, HashInfoFile)
-	}
+	// // Encrypt all backup components for security
+	// if err := encryptFile(hashInfoPath, key, iv); err != nil {
+	// 	return Result{}, cosy.WrapErrorWithParams(ErrEncryptFile, HashInfoFile)
+	// }
 
-	if err := encryptFile(nginxUIZipPath, key, iv); err != nil {
-		return Result{}, cosy.WrapErrorWithParams(ErrEncryptNginxUIDir, err.Error())
-	}
+	// if err := encryptFile(nginxUIZipPath, key, iv); err != nil {
+	// 	return Result{}, cosy.WrapErrorWithParams(ErrEncryptNginxUIDir, err.Error())
+	// }
 
-	if err := encryptFile(nginxZipPath, key, iv); err != nil {
-		return Result{}, cosy.WrapErrorWithParams(ErrEncryptNginxDir, err.Error())
-	}
+	// if err := encryptFile(nginxZipPath, key, iv); err != nil {
+	// 	return Result{}, cosy.WrapErrorWithParams(ErrEncryptNginxDir, err.Error())
+	// }
 
 	// Clean up unencrypted directories to prevent duplication in final archive
 	if err := os.RemoveAll(nginxUITempDir); err != nil {
@@ -168,16 +156,14 @@ func Backup() (Result, error) {
 	}
 
 	// Encode encryption keys as base64 for safe transmission/storage
-	keyBase64 := base64.StdEncoding.EncodeToString(key)
-	ivBase64 := base64.StdEncoding.EncodeToString(iv)
 
 	// Assemble final backup result
 	result := Result{
-		BackupContent: buffer.Bytes(),
-		BackupName:    backupName,
-		AESKey:        keyBase64,
-		AESIv:         ivBase64,
-	}
+	BackupContent: buffer.Bytes(),
+	BackupName:    backupName,
+	AESKey:        "",
+	AESIv:         "",
+}
 
 	logger.Infof("Backup created successfully: %s (size: %d bytes)", backupName, len(buffer.Bytes()))
 	return result, nil

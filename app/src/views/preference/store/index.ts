@@ -104,6 +104,9 @@ const useSystemSettingsStore = defineStore('systemSettings', () => {
       rpid: '',
       rp_origins: [],
     },
+    backup: {
+      granted_access_path: [],
+    },
   })
   const errors = ref<Record<string, Record<string, string>>>({})
 

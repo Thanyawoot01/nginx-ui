@@ -6,7 +6,6 @@ import NginxControl from '@/components/NginxControl'
 import Notification from '@/components/Notification'
 import ProcessingStatus from '@/components/ProcessingStatus'
 import { SelfCheckHeaderBanner } from '@/components/SelfCheck'
-import SetLanguage from '@/components/SetLanguage'
 import SwitchAppearance from '@/components/SwitchAppearance'
 
 const emit = defineEmits<{
@@ -54,8 +53,6 @@ const { width: userWrapperWidth } = useElementSize(userWrapperRef)
       class="user-wrapper"
       :size="24"
     >
-      <SetLanguage v-if="!isWorkspace" class="set_lang" />
-
       <SwitchAppearance />
 
       <div v-if="!isWorkspace" class="workspace-entry">
@@ -125,7 +122,4 @@ const { width: userWrapperWidth } = useElementSize(userWrapperRef)
   right: 28px;
 }
 
-.set_lang {
-  display: inline;
-}
 </style>

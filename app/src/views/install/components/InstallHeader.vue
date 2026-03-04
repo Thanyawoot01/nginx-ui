@@ -4,7 +4,7 @@
 
 <template>
   <div class="project-title">
-    <h1>Nginx UI</h1>
+    <h1>Group B</h1>
     <h3>
       {{ $gettext('Install') }}
     </h3>
@@ -15,11 +15,13 @@
 .project-title {
   margin: 50px;
   margin-bottom: 20px;
+
   h1 {
     font-size: 50px;
     font-weight: 100;
     text-align: center;
   }
+
   h3 {
     font-size: 20px;
     text-align: center;

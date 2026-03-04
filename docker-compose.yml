@@ -64,6 +64,22 @@ services:
       - frontend
       - backend
 
+  phpmyadmin:
+    image: phpmyadmin:latest
+    container_name: nginx-ui-phpmyadmin
+    restart: always
+    ports:
+      - "8081:80"
+    environment:
+      PMA_HOST: mariadb
+      PMA_PORT: 3306
+      PMA_USER: nginx_ui
+      PMA_PASSWORD: nginx_ui_pass
+    depends_on:
+      mariadb:
+        condition: service_healthy
+
+
 volumes:
   nginx-data:
   nginx-ui-data:
